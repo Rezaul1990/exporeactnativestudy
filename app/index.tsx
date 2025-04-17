@@ -16,7 +16,7 @@ export default function Index() {
 
   useEffect(() => {
     if (isReady) {
-      router.replace("/screens/homescreen/home");
+      router.replace("/authentication/login/login");
     }
   }, [isReady]);
 
