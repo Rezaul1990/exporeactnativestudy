@@ -10,7 +10,10 @@
             "cwd": "${workspaceFolder}",
             "type": "reactnativedirect",
             "request": "attach",
-            "isDynamic": true
+            "isDynamic": true,
+            "host": "localhost", // ✅ or your local IP
+            "port": 8081,           // ✅ Specify the port
+            "platform": "expo",
         }
     ]
 }

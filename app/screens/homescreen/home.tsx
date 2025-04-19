@@ -1,68 +1,66 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { Ionicons, FontAwesome, Entypo } from '@expo/vector-icons';
-import { useAuthStore } from '@/store/useAuthStore';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useTodayClasses } from '@/hooks/useTodayClasses';
 import { Link } from 'expo-router';
+import HeaderBar from './component/HeaderBar';
+import ProfileDrawer from './component/ProfileDrawer';
 
 export default function Home() {
-  const profile = useAuthStore((state) => state.profile);
-  const { todayClasses, count } = useTodayClasses();
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const { count } = useTodayClasses();
+
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.welcomeText}>Welcome back</Text>
-          <Text style={styles.userName}>{profile?.FirstName} {profile?.LastName}</Text>
-          <Text style={styles.subTitle}>Member - {profile?.ClubName}</Text>
-        </View>
-        <TouchableOpacity>
-          <Entypo name="dots-three-vertical" size={20} color="white" />
-        </TouchableOpacity>
-      </View>
+    <View style={{ flex: 1 }}>
+      {/* Main scrollable content */}
+      <ScrollView style={styles.container} contentContainerStyle={{ opacity: drawerVisible ? 0.3 : 1 }}>
+        <HeaderBar onProfilePress={() => setDrawerVisible(true)} />
+        
+        {/* Info Cards */}
+        <View style={styles.cardContainer}>
+          <View style={[styles.infoCard, { borderColor: '#f8d7da' }]}>
+            <FontAwesome name="money" size={24} color="#dc3545" style={styles.cardIcon} />
+            <View>
+              <Text style={styles.cardTitle}>You have outstanding payments</Text>
+              <Text style={styles.cardSubtitle}>View & Pay your outstanding bills</Text>
+            </View>
+          </View>
 
-      {/* Info Cards */}
-      <View style={styles.cardContainer}>
-        <View style={[styles.infoCard, { borderColor: '#f8d7da' }]}> 
-          <FontAwesome name="money" size={24} color="#dc3545" style={styles.cardIcon} />
-          <View>
-            <Text style={styles.cardTitle}>You have outstanding payments</Text>
-            <Text style={styles.cardSubtitle}>View & Pay your outstanding bills</Text>
+          <View style={[styles.infoCard, { borderColor: '#d4edda' }]}>
+            <View style={styles.bookingBadge}><Text style={styles.bookingNumber}>2</Text></View>
+            <View>
+              <Text style={styles.cardTitle}>You have {count} bookings today</Text>
+              <Text style={styles.cardSubtitle}>See your bookings for today</Text>
+            </View>
           </View>
         </View>
 
-        <View style={[styles.infoCard, { borderColor: '#d4edda' }]}> 
-          <View style={styles.bookingBadge}><Text style={styles.bookingNumber}>2</Text></View>
-          <View>
-            <Text style={styles.cardTitle}>You have {count} bookings today</Text>
-            <Text style={styles.cardSubtitle}>See your bookings for today</Text>
-          </View>
-        </View>
-      </View>
+        {/* Action List */}
+        <Text style={styles.sectionTitle}>What would you like to do?</Text>
+        {actions.map((item, index) => (
+          <Link key={index} href={item.href} asChild>
+            <TouchableOpacity style={styles.actionRow}>
+              <View style={styles.iconWrap}>
+                <Ionicons name={item.icon} size={24} color={item.color || '#000'} />
+              </View>
+              <View style={styles.actionContent}>
+                <Text style={styles.actionTitle}>{item.title}</Text>
+                <Text style={styles.actionSubtitle}>{item.subtitle}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#000" />
+            </TouchableOpacity>
+          </Link>
+        ))}
+      </ScrollView>
 
-      {/* Action List */}
-      <Text style={styles.sectionTitle}>What would you like to do?</Text>
-      {actions.map((item, index) => {
-          
-          return (
-            <Link key={index} href={item.href} asChild>
-              <TouchableOpacity style={styles.actionRow}>
-                <View style={styles.iconWrap}>
-                  <Ionicons name={item.icon} size={24} color={item.color || '#000'} />
-                </View>
-                <View style={styles.actionContent}>
-                  <Text style={styles.actionTitle}>{item.title}</Text>
-                  <Text style={styles.actionSubtitle}>{item.subtitle}</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color="#000" />
-              </TouchableOpacity>
-            </Link>
-          );
-        })}
-    </ScrollView>
+      {/* Drawer - overlay */}
+      {drawerVisible && (
+        <ProfileDrawer onClose={() => setDrawerVisible(false)} />
+      )}
+    </View>
   );
 }
+
 
 const actions = [
   {

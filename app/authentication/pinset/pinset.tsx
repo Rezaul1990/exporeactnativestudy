@@ -31,6 +31,7 @@ export default function PinScreen() {
   };
 
   const confirmPin = async () => {
+    debugger; // 👈 This will trigger debugger tools if they're open
     const enteredPin = pinArray.join('');
   console.log('[DEBUG] Entered PIN:', enteredPin);
   console.log('[DEBUG] Stored PIN:', pin);

@@ -20,6 +20,7 @@ export default function Login() {
     setIsLoading(true); // ⏳ Start loader
     try {
       const clubs = await getUserClubs(email, password, 'UK');
+      debugger; // Check if clubs are fetched successfully
 
       setCredentials(email, password);
       router.replace('/authentication/pinset/pinset');
