@@ -67,7 +67,7 @@ const actions = [
     title: 'Club Schedule',
     subtitle: 'What is on & book sessions or courses',
     icon: 'calendar-outline',
-    href: '/schedule'
+    href: '/screens/shedule/shedule'
   },
   {
     title: 'Manage & Make bookings',
