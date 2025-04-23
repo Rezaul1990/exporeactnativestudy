@@ -1,12 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router'; // ✅ make sure this is imported
+import { router, useRouter } from 'expo-router'; // ✅ make sure this is imported
+import { useAuthStore } from '@/store/useAuthStore';
 
 const { width } = Dimensions.get('window');
 
 export default function ProfileDrawer({ onClose }) {
   const slideAnim = useRef(new Animated.Value(width)).current;
+  const router = useRouter();
+  const clearCredentials = useAuthStore((state) => state.clearCredentials);
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -27,7 +30,7 @@ export default function ProfileDrawer({ onClose }) {
   };
 
   const menuItems = [
-    { label: 'Go to your profile', href: '/profile' },
+    { label: 'Go to your profile', href: '/screens/memberprofile/MemberProfile' },
     { label: 'Switch to another profile', href: '/switch-profile' },
     { label: 'App settings', href: '/screens/setting/setting' },
     { label: 'Log out', action: 'logout' }, // 👈 custom logic here
@@ -35,7 +38,8 @@ export default function ProfileDrawer({ onClose }) {
 
   const handleMenuPress = (item) => {
     if (item.action === 'logout') {
-      // TODO: Add your logout logic here (authStore.clear(), AsyncStorage.removeItem(), etc.)
+      clearCredentials(); // clear zustand state
+      router.replace('/authentication/login/login'); // go to login screen
       console.log('Logging out...');
     } else {
       router.push(item.href);

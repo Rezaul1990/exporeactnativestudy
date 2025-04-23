@@ -16,12 +16,17 @@ export default function Login() {
     if (!email || !password) {
       return Alert.alert("Missing Fields", "Please enter email and password");
     }
-
-    setIsLoading(true); // ⏳ Start loader
+  
+    setIsLoading(true);
     try {
       const clubs = await getUserClubs(email, password, 'UK');
-      debugger; // Check if clubs are fetched successfully
-
+      console.log('[DEBUG] Club Fetch Response:', clubs);
+  
+      if (Array.isArray(clubs) && clubs.length > 0) {
+        console.log('[DEBUG] ClubID:', clubs[0].ClubID);
+        console.log('[DEBUG] UserID:', clubs[0].UserID);
+      }
+  
       setCredentials(email, password);
       router.replace('/authentication/pinset/pinset');
     } catch (error: any) {
@@ -29,9 +34,10 @@ export default function Login() {
       const message = error?.response?.data?.message || 'Invalid credentials or server error';
       Alert.alert('Login Failed', message);
     } finally {
-      setIsLoading(false); // ✅ Stop loader
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <View style={styles.container}>

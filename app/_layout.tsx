@@ -9,12 +9,15 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import CustomBottomTab from '../components/CustomBottomTab';
+import { useAuthStore } from '@/store/useAuthStore';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
+  const { email } = useAuthStore();
+  const isLoggedIn = !!email;
 
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -38,7 +41,7 @@ export default function RootLayout() {
         <View style={styles.content}>
           <Slot />
         </View>
-        {showTab && <CustomBottomTab />}
+        {showTab && isLoggedIn && <CustomBottomTab />}
       </View>
       <StatusBar style="auto" />
     </ThemeProvider>

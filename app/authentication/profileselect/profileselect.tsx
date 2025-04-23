@@ -29,9 +29,14 @@ export default function ProfileSelect() {
 
   const handleDashboardNavigation = () => {
     if (!selectedProfile) return;
-    const { ClubID, UserID } = selectedProfile;
-    setUserInfo(ClubID, UserID, selectedProfile); // ✅ full profile passed
-    router.push('/screens/homescreen/home');
+
+  const { ClubID, UserID } = selectedProfile;
+
+  console.log('[DEBUG] Navigating with ClubID:', ClubID);
+  console.log('[DEBUG] Navigating with UserID:', UserID);
+
+  setUserInfo(ClubID, UserID, selectedProfile); // ✅ Stores in Zustand and fetches combinedData
+  router.push('/screens/homescreen/home');
   };
 
   return (

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
-export default function ClubCalendar({ onDateSelect }) {
+export default function  ClubCalendar({ onDateSelect }) {
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');

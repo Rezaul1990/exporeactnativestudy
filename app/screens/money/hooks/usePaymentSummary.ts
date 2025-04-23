@@ -1,0 +1,31 @@
+// hooks/usePaymentSummary.ts
+import { useAuthStore } from '@/store/useAuthStore';
+
+export default function usePaymentSummary() {
+  const combinedData = useAuthStore((state) => state.combinedData);
+  const classes = combinedData?.SevenDaysClasses || [];
+
+  const now = new Date();
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(now.getMonth() - 1);
+
+  let paid = 0;
+  let outstanding = 0;
+
+  classes.forEach((cls) => {
+    const classDate = new Date(cls.ClassDate1);
+    const isWithinRange = classDate >= oneMonthAgo && classDate <= now;
+
+    if (isWithinRange) {
+      const cost = Number(cls.Cost) || 0;
+
+      if (cls.PaymentStatus === 'Free') {
+        paid += cost;
+      } else if (cls.PaymentStatus === 'Unpaid') {
+        outstanding += cost;
+      }
+    }
+  });
+
+  return { paid, outstanding };
+}

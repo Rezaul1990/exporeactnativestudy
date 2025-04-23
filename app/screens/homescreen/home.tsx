@@ -79,7 +79,7 @@ const actions = [
     title: 'Check in to a class',
     subtitle: 'Check into a class',
     icon: 'log-in-outline',
-    href: '/checkin'
+    href: '/screens/checkintoclass/checkintoclass'
   },
   {
     title: 'Manage your payments',
