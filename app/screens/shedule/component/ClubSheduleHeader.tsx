@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; // for three vertical dots icon
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function ClubSheduleHeader() {
+  const profile = useAuthStore((state) => state.profile);
   return (
     <View style={styles.header}>
       <View style={styles.left}>
-        <Text style={styles.subTitle}>Virtus Jiu Jitsu Academy</Text>
+        <Text style={styles.subTitle}>{profile?.ClubName}</Text>
         <Text style={styles.title}>Club Schedule</Text>
       </View>
       <TouchableOpacity style={styles.right}>

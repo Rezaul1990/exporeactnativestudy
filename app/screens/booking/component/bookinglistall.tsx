@@ -22,11 +22,16 @@ export default function BookingListAll({
   return (
     <TouchableOpacity onPress={onPress} style={[styles.card, { borderColor }]}>
       <View style={styles.row}>
+        {/* Left Dot */}
         <View style={[styles.leftDot, { backgroundColor: leftDotColor }]} />
+
+        {/* Text Area */}
         <View style={styles.textSection}>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.subtitle}>{subtitle}</Text>
         </View>
+
+        {/* Arrow Button */}
         <View style={[styles.arrowWrap, { backgroundColor: arrowBg }]}>
           <Ionicons name="arrow-forward" size={20} color="#fff" />
         </View>
@@ -43,10 +48,10 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 6,
-    elevation: 3,
+    elevation: 2,
   },
   row: {
     flexDirection: 'row',
@@ -65,10 +70,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
     marginBottom: 4,
+    color: '#111',
   },
   subtitle: {
     fontSize: 12,
-    color: '#666',
+    color: '#555',
   },
   arrowWrap: {
     padding: 8,

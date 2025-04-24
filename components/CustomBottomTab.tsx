@@ -2,18 +2,24 @@ import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet, Platform } from "react-native";
 import { useRouter, usePathname } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
-
-const tabs = [
-    { route: "/screens/homescreen/home", label: "Dashboard", icon: "home" },
-    { route: "/screens/shedule/shedule", label: "Schedule", icon: "calendar-alt" },
-    { route: "/screens/money/money", label: "Money", icon: "money-bill-wave" },
-    { route: "/screens/profilescreen/profile", label: "Profile", icon: "calendar-check" },
-    { route: "/screens/setting/setting", label: "Setting", icon: "comment-alt" },
-  ];
+import { useHasPermission, useIsClubOwner } from "@/hooks/useAccessControl";
 
 export default function CustomBottomTab() {
   const router = useRouter();
   const pathname = usePathname();
+
+  const isClubOwner = useIsClubOwner();
+  const hasMoneyAccess = useHasPermission("MoneyDashboard");
+
+  const tabs = [
+    { route: "/screens/homescreen/home", label: "Dashboard", icon: "home" },
+    { route: "/screens/shedule/shedule", label: "Schedule", icon: "calendar-alt" },
+    ...(hasMoneyAccess && isClubOwner
+      ? [{ route: "/screens/money/money", label: "Money", icon: "money-bill-wave" }]
+      : []),
+    { route: "/screens/profilescreen/profile", label: "Profile", icon: "calendar-check" },
+    { route: "/screens/setting/setting", label: "Setting", icon: "comment-alt" },
+  ];
 
   const isActive = (route: string) => pathname === route;
 

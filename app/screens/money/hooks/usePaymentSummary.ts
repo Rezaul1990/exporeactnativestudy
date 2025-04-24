@@ -2,8 +2,7 @@
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function usePaymentSummary() {
-  const combinedData = useAuthStore((state) => state.combinedData);
-  const classes = combinedData?.SevenDaysClasses || [];
+  const sevenDaysClasses = useAuthStore((state) => state.sevenDaysClasses) || [];
 
   const now = new Date();
   const oneMonthAgo = new Date();
@@ -12,7 +11,7 @@ export default function usePaymentSummary() {
   let paid = 0;
   let outstanding = 0;
 
-  classes.forEach((cls) => {
+  sevenDaysClasses.forEach((cls) => {
     const classDate = new Date(cls.ClassDate1);
     const isWithinRange = classDate >= oneMonthAgo && classDate <= now;
 

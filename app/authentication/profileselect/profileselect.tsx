@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { getProfileData } from '@/services/ProfileService';
+import { getCombinedData, getProfileData } from '@/services/ProfileService';
 import { Profile } from '@/models/Profile';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -27,16 +27,39 @@ export default function ProfileSelect() {
     console.log('[DEBUG] Zustand PIN:', pin);
   }, []);
 
-  const handleDashboardNavigation = () => {
+  const handleDashboardNavigation = async () => {
     if (!selectedProfile) return;
-
-  const { ClubID, UserID } = selectedProfile;
-
-  console.log('[DEBUG] Navigating with ClubID:', ClubID);
-  console.log('[DEBUG] Navigating with UserID:', UserID);
-
-  setUserInfo(ClubID, UserID, selectedProfile); // ✅ Stores in Zustand and fetches combinedData
-  router.push('/screens/homescreen/home');
+  
+    const { ClubID, UserID } = selectedProfile;
+    const { email, password } = useAuthStore.getState();
+    const { setSevenDaysClasses, setUserData, setUserInfo } = useAuthStore.getState();
+  
+    console.log('[DEBUG] Navigating with ClubID:', ClubID);
+    console.log('[DEBUG] Navigating with UserID:', UserID);
+  
+    // ✅ Store user ID and club ID
+    setUserInfo(ClubID, UserID, selectedProfile);
+  
+    try {
+      const data = await getCombinedData(ClubID, UserID, email, password);
+  
+      // ✅ Optional: Store user info (e.g., Permissions)
+      if (data?.User) {
+        setUserData(data.User);
+         // ✅ Log all permissions
+      console.log('[DEBUG] User Permissions:', data.User.Permissions);
+      }
+  
+      // ✅ Store classes
+      if (Array.isArray(data?.SevenDaysClasses)) {
+        setSevenDaysClasses(data.SevenDaysClasses);
+      }
+  
+      console.log('[DEBUG] Stored SevenDaysClasses:', data.SevenDaysClasses?.length || 0);
+      router.push('/screens/homescreen/home');
+    } catch (err) {
+      console.error('[DASHBOARD LOAD ERROR]', err);
+    }
   };
 
   return (

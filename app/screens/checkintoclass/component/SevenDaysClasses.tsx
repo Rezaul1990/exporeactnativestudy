@@ -4,9 +4,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 const SevenDaysClasses = () => {
   const sevenDaysClasses = useAuthStore((state) =>
-    Array.isArray(state.combinedData?.SevenDaysClasses)
-      ? state.combinedData.SevenDaysClasses
-      : []
+    Array.isArray(state.sevenDaysClasses) ? state.sevenDaysClasses : []
   );
 
   const renderItem = ({ item }: any) => (

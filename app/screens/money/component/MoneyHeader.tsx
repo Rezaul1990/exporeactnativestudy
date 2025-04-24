@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const MoneyHeader = () => {
+  const profile = useAuthStore((state) => state.profile);
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.subTitle}>Virtus Jiu Jitsu Academy</Text>
+        <Text style={styles.subTitle}>{profile?.ClubName}</Text>
         <Text style={styles.title}>Money & Payments</Text>
       </View>
 

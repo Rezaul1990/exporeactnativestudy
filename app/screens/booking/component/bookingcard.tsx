@@ -1,19 +1,21 @@
+import { useTodayClasses } from '@/hooks/useTodayClasses';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 export default function BookingCard() {
+  const { count: todayCount, todayClasses, courseCount } = useTodayClasses();
   return (
     <View style={styles.container}>
       {/* Card 1 */}
       <View style={[styles.card, { borderColor: '#B4E800' }]}>
-        <Text style={styles.number}>10</Text>
+        <Text style={styles.number}>{todayCount}</Text>
         <Text style={styles.title}>Available classes today</Text>
         <Text style={styles.subtitle}>Or view full schedule below</Text>
       </View>
 
       {/* Card 2 */}
       <View style={[styles.card, { borderColor: '#3CA3D9' }]}>
-        <Text style={styles.number}>2</Text>
+        <Text style={styles.number}>{courseCount}</Text>
         <Text style={styles.title}>Upcoming courses</Text>
         <Text style={styles.subtitle}>View all courses below</Text>
       </View>

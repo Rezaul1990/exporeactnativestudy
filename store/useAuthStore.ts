@@ -1,99 +1,90 @@
+// 📁 store/useAuthStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getCombinedData } from '@/services/ProfileService';
-import { Buffer } from 'buffer';
-import { Profile } from '@/models/Profile';
+import { AuthStateModel } from '@/models/AuthStateModel';
 
-// 🔐 SecureStore wrapper for zustand persist
-const secureStorage = {
-  getItem: async (key: string) => {
-    const value = await SecureStore.getItemAsync(key);
-    return value ? JSON.parse(value) : null;
-  },
-  setItem: async (key: string, value: any) => {
-    await SecureStore.setItemAsync(key, JSON.stringify(value));
-  },
-  removeItem: async (key: string) => {
-    await SecureStore.deleteItemAsync(key);
-  },
-};
 
-type AuthState = {
-  email: string;
-  password: string;
-  pin: string;
-  clubId: number | null;
-  userId: number | null;
-  profile: Profile | null;
-  combinedData: {
-    SevenDaysClasses?: any[];
-    MemberCount?: number;
-    CoachCount?: number;
-    AllMembers?: any[];
-    AllClasses?: any[];
-    Club?: any;
-    Groups?: any[];
-    GlobalSettings?: any;
-  } | null;
-  setCredentials: (email: string, password: string, pin?: string) => void;
-  setUserInfo: (clubId: number, userId: number, profile: Profile) => Promise<void>;
-  setCombinedData: (data: any) => void;
-  clearCredentials: () => void;
-};
 
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create<AuthStateModel>()(
   persist(
     (set, get) => ({
       email: '',
       password: '',
+      pin: '',
       clubId: null,
       userId: null,
       profile: null,
-      combinedData: null,
-      pin: '',
+      userInfo: null,
+      sevenDaysClasses: null,
 
-      setCredentials: (email, password, pin = '') =>
-        set({ email, password, pin }),
+      setCredentials: (email, password, pin = '') => set({ email, password, pin }),
 
       setUserInfo: async (clubId, userId, profile) => {
-        const { email, password } = get();
+        const { email, password, setUserData, setSevenDaysClasses } = get();
         set({ clubId, userId, profile });
 
         try {
           const data = await getCombinedData(clubId, userId, email, password);
-          const filteredData = {
-            SevenDaysClasses: data.SevenDaysClasses,
-            MemberCount: data.MemberCount,
-            CoachCount: data.CoachCount,
-            AllMembers: data.AllMembers,
-            AllClasses: data.AllClasses,
-            Club: data.Club,
-            Groups: data.Groups,
-            GlobalSettings: data.GlobalSettings,
-          };
-          set({ combinedData: filteredData });
+
+          if (data?.User) {
+            setUserData(data.User);
+          }
+
+          if (Array.isArray(data?.SevenDaysClasses)) {
+            setSevenDaysClasses(data.SevenDaysClasses);
+          }
         } catch (error) {
-          console.error('[Store] Combined data fetch failed:', error);
+          console.error('[Store] Failed to fetch user or class data:', error);
         }
       },
 
-      setCombinedData: (data) => set({ combinedData: data }),
+      setUserData: (user) =>
+        set({
+          userInfo: {
+            FullName: user?.FullName,
+            Email: user?.Email,
+            Permissions: user?.Permissions || [],
+            payments: user?.payments || [],
+            classes: user?.classes || [],
+            PermissionId: user?.PermissionId,
+            SystemRole: user?.SystemRole,
+          },
+        }),
+
+      setSevenDaysClasses: (classes) => set({ sevenDaysClasses: classes }),
 
       clearCredentials: () =>
         set({
           email: '',
           password: '',
+          pin: '',
           clubId: null,
           userId: null,
           profile: null,
-          combinedData: null,
-          pin: '',
+          userInfo: null,
+          sevenDaysClasses: null,
         }),
     }),
     {
       name: 'auth-storage',
-      storage: secureStorage,
+      storage: {
+        getItem: async (key) => {
+          const value = await AsyncStorage.getItem(key);
+          return value ? JSON.parse(value) : null;
+        },
+        setItem: async (key, value) => {
+          await AsyncStorage.setItem(key, JSON.stringify(value));
+        },
+        removeItem: async (key) => {
+          await AsyncStorage.removeItem(key);
+        },
+      },
+      partialize: (state) => {
+        const { userInfo, sevenDaysClasses, ...rest } = state;
+        return rest;
+      },
     }
   )
 );

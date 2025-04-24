@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useTodayClasses } from '@/hooks/useTodayClasses';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import HeaderBar from './component/HeaderBar';
 import ProfileDrawer from './component/ProfileDrawer';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function Home() {
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -26,20 +27,33 @@ export default function Home() {
             </View>
           </View>
 
-          <View style={[styles.infoCard, { borderColor: '#d4edda' }]}>
-            <View style={styles.bookingBadge}><Text style={styles.bookingNumber}>2</Text></View>
+          <TouchableOpacity
+            style={[styles.infoCard, { borderColor: '#d4edda' }]}
+            onPress={() => router.push('/screens/bookingtoday/BookingToday')}
+          >
+            <View style={styles.bookingBadge}>
+              <Text style={styles.bookingNumber}>{count}</Text>
+            </View>
             <View>
               <Text style={styles.cardTitle}>You have {count} bookings today</Text>
               <Text style={styles.cardSubtitle}>See your bookings for today</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Action List */}
         <Text style={styles.sectionTitle}>What would you like to do?</Text>
-        {actions.map((item, index) => (
-          <Link key={index} href={item.href} asChild>
-            <TouchableOpacity style={styles.actionRow}>
+        {actions.map((item, index) => {
+          const handlePress = () => {
+            if (item.onPress) {
+              item.onPress(); // call custom handler if present
+            } else {
+              router.push(item.href);
+            }
+          };
+
+          return (
+            <TouchableOpacity key={index} style={styles.actionRow} onPress={handlePress}>
               <View style={styles.iconWrap}>
                 <Ionicons name={item.icon} size={24} color={item.color || '#000'} />
               </View>
@@ -49,8 +63,8 @@ export default function Home() {
               </View>
               <Ionicons name="chevron-forward" size={20} color="#000" />
             </TouchableOpacity>
-          </Link>
-        ))}
+          );
+        })}
       </ScrollView>
 
       {/* Drawer - overlay */}
@@ -79,7 +93,11 @@ const actions = [
     title: 'Check in to a class',
     subtitle: 'Check into a class',
     icon: 'log-in-outline',
-    href: '/screens/checkintoclass/checkintoclass'
+    onPress: () => {
+      const classes = useAuthStore.getState().sevenDaysClasses;
+      console.log('[DEBUG] SevenDaysClasses on Check-in:', classes);
+      router.push('/screens/checkintoclass/checkintoclass');
+    }
   },
   {
     title: 'Manage your payments',

@@ -4,6 +4,7 @@ import { Buffer } from 'buffer';
 import { API_BASE_URL } from '@/constants/AuthApi';
 import { Profile } from '@/models/Profile';
 import { useAuthStore } from '@/store/useAuthStore';
+import { CombinedData } from '@/models/CombinedDataModel';
 
 export const getProfileData = async (): Promise<Profile[]> => {
   const { email, password } = useAuthStore.getState(); // ✅ Zustand works outside React too
@@ -20,19 +21,30 @@ export const getProfileData = async (): Promise<Profile[]> => {
   return response.data;
 };
 
-export async function getCombinedData(clubId: number, userId: number, email: string, password: string): Promise<any> {
-  const authHeader = 'Basic ' + Buffer.from(`${email}:${password}`).toString('base64');
-  const url = `https://appwebservices.coacha.app/api/data/combineddata3/?v=cPEp5lh0Ynel&clubId=${clubId}&userId=${userId}&country=UK`;
 
-  const res = await fetch(url, {
+
+export async function getCombinedData(
+  clubId: number,
+  userId: number,
+  email: string,
+  password: string
+): Promise<CombinedData> {
+  const token = Buffer.from(`${email}:${password}`).toString('base64');
+
+  const url = `${API_BASE_URL}api/data/combineddata3/?v=cPEp5lh0Ynel&clubId=${clubId}&userId=${userId}&country=UK`;
+
+  const response = await axios.get(url, {
     headers: {
-      Authorization: authHeader,
+      Authorization: `Basic ${token}`,
       Accept: 'application/json',
     },
   });
 
-  const text = await res.text();
-  if (!text || text.trim() === '') throw new Error('Empty response from API');
+  if (!response.data || (typeof response.data === 'string' && response.data.trim() === '')) {
+    throw new Error('Empty response from API');
+  }
 
-  return JSON.parse(text);
+  return typeof response.data === 'string'
+    ? JSON.parse(response.data)
+    : response.data;
 }

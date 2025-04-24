@@ -3,18 +3,32 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { isToday, parseISO } from 'date-fns';
 
 export const useTodayClasses = () => {
-  const combinedData = useAuthStore((state) => state.combinedData);
+  const sevenDaysClasses = useAuthStore((state) => state.sevenDaysClasses) || [];
 
-  const todayClasses = useMemo(() => {
-    if (!combinedData?.sevendaysclasses) return [];
+  const { todayClasses, courseCount } = useMemo(() => {
+    const todayList = [];
+    let courseCount = 0;
 
-    return combinedData.sevendaysclasses.filter((cls: any) =>
-      isToday(parseISO(cls.startTime))
-    );
-  }, [combinedData]);
+    for (const cls of sevenDaysClasses) {
+      const dateStr = cls.ClassDate1 || cls.ClassStart;
+      if (dateStr && isToday(parseISO(dateStr))) {
+        todayList.push(cls);
+      }
+
+      if (cls.Course === true) {
+        courseCount++;
+      }
+    }
+
+    return {
+      todayClasses: todayList,
+      courseCount,
+    };
+  }, [sevenDaysClasses]);
 
   return {
     todayClasses,
     count: todayClasses.length,
+    courseCount,
   };
 };
